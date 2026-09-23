@@ -1,0 +1,9 @@
+#include<stdio.h>
+#define	_CRT_SECURE_NO_WARNINGS
+#include <string.h>
+int main() {
+	printf("==============================\n");
+	printf("welcome to supermarket!!!\n");
+	printf("==============================\n");
+	return 0;
+}
