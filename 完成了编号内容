@@ -1,0 +1,21 @@
+#include<stdio.h>
+#define	_CRT_SECURE_NO_WARNINGS
+#include <string.h>
+struct product {
+	char code[10];
+	char name[50];
+	float price;
+};
+
+int main() {
+	struct product shop[3] = {
+		{"001","Cola",3.50},
+		{"002","Lollipop",0.50},
+		{"003","Nooldes",6.00}
+	};
+	int a = 3;
+	char inputcode[10];
+	pritf("=== 7-11 POS System===\n");
+	pritf("shu ru code mai   shu ru 0 tui chu:\n\n");
+
+}
