@@ -1,0 +1,160 @@
+#define	_CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include <string.h>
+#include<time.h>
+struct product {
+	char code[10];
+	char name[50];
+	float price;
+};
+struct CartItem {
+	char code[10];
+	int quantity;
+};
+
+int main() {
+	struct salesrecord {
+		int orderno;
+		float total;
+	};
+	struct salesrecord records[100];
+	int recordcount = 0;
+	struct product shop[3] = {
+		{"001","Cola",3.50},
+		{"002","Lollipop",0.50},
+		{"003","Noodles",6.00}
+	};
+	int a = 3;
+	struct CartItem cart[100];
+	int b = 0;
+	float sum_price = 0;
+	char inputcode[100];
+	printf("=== 7-11 POS System===\n");
+	printf("shu ru code mai   shu ru 0 tui chu:\n\n");
+	while (1) {
+		printf("Barcode: ");
+		scanf("%99s", inputcode);
+
+		if (strcmp(inputcode, "quit") == 0 || strcmp(inputcode, "exit") == 0) {
+			printf("Goodbye!!!\n");
+			return 0;
+		}
+		else if (strcmp(inputcode, "0") == 0) {
+			printf("Goodbye\n");
+			break;
+		}
+		else if (strcmp(inputcode, "prices") == 0 || strcmp(inputcode, "price") == 0) {
+			printf("\nItem\t\tNo.\tPri.\n");
+			printf("-----------------------------\n");
+			for (int i = 0; i < a; i++) {
+				printf(" ");
+				fputs(shop[i].name, stdout);
+				printf("\t\t");
+				fputs(shop[i].code, stdout);
+				printf("\t$%.2f\n", shop[i].price);
+			}
+			printf("-----------------------------\n\n");
+			continue;
+		}
+		else if (strcmp(inputcode, "sales") == 0 || strcmp(inputcode, "sale") == 0) {
+			FILE* fp = fopen("sales.txt", "r");
+			if (fp == NULL) {
+				printf("No sales record yet");
+			}
+			else {
+				char line[100];
+				printf("\n------Sales Records-------\n");
+				while (fgets(line, sizeof(line), fp) != NULL) {
+					printf("%s",line);
+					}
+				fclose(fp);
+			}
+			continue;
+		}
+		else if (strcmp(inputcode, "newday") == 0) {
+			FILE* fp = fopen("sales.txt","w");
+			if (fp != NULL) {
+				fclose(fp);
+				recordcount = 0;
+				printf("Newday started.sales records cleared.\n");
+			}
+			continue;
+		}
+		else if (strcmp(inputcode, "checkout") == 0 || strcmp(inputcode, "Checkout") == 0) {
+			if (b == 0) {
+				printf("you have not bought anything!!!\n");
+				continue;
+			}
+			printf("\nsum_price:$%.2f\n", sum_price);
+			printf("Please insert money:$");
+			float paid;
+			scanf("%f", &paid);
+			while (paid < sum_price) {
+				printf("you still owe:$%.2f\n", sum_price - paid);
+				printf("Please insert more money:$");
+				float extra;
+				scanf("%f", &extra);
+				paid += extra;
+			}
+			printf("your change is :$%.2f\n", paid - sum_price);
+			printf("thank you!!!\n");
+			time_t now = time(NULL);
+			struct tm* local = localtime(&now);
+			FILE* fp = fopen("sales.txt", "a");
+			if (fp != NULL) {
+				recordcount++;
+				fprintf(fp, "NO.%d\tTime:%02d:%02d%02d\tSum:%.2f\n", recordcount,local->tm_hour,local->tm_min,local->tm_sec,sum_price);
+				for (int j = 0;j < b;j++) {
+					for (int i = 0;i < a;i++) {
+						if (strcmp(cart[j].code, shop[i].code) == 0) {
+							fprintf(fp, "\t%s x %d=$%.2f\n", shop[i].name, cart[j].quantity, shop[i].price* cart[j].quantity);
+							break;
+						}
+					}
+				}
+				fprintf(fp,"--------------------------\n");
+				fclose(fp);
+				printf("(Transaction saved to sales.txt)\n");
+			}
+			b = 0;
+			sum_price = 0;
+			continue;
+		}
+		else {
+			int found = -1;
+			for (int i = 0; i < a; i++) {
+				if (strcmp(inputcode, shop[i].code) == 0) {
+					printf("Item: ");
+					fputs(shop[i].name, stdout);
+					printf(", price: $%.2f\n", shop[i].price);
+					found = i;
+					break;
+				}
+			}
+			if (found == -1) {
+				printf("product not found!\n");
+			}
+			else {
+				sum_price += shop[found].price;
+				int c = -1;
+				for (int j = 0; j < b; j++) {
+					if (strcmp(cart[j].code, inputcode) == 0) {
+						c = j;
+						break;
+					}
+				}
+				if (c != -1) {
+					cart[c].quantity++;
+					printf("Added: %s (quantity:%d)\n", shop[found].name, cart[c].quantity);
+				}
+				else {
+					strcpy(cart[b].code, inputcode);
+					cart[b].quantity = 1;
+					b++;
+					printf("Added: %s (quantity:1)\n", shop[found].name);
+				}
+			}
+		}
+	}
+		return 0;
+}
