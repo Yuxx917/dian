@@ -1,0 +1,88 @@
+#define	_CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include <string.h>
+struct product {
+	char code[10];
+	char name[50];
+	float price;
+};
+struct CartItem {
+	char code[10];
+	int quantity;
+};
+
+int main() {
+	struct product shop[3] = {
+		{"001","Cola",3.50},
+		{"002","Lollipop",0.50},
+		{"003","Noodles",6.00}
+	};
+	int a = 3;
+	struct CartItem cart[100];
+	int b = 0;
+	float sum_price = 0;
+	char inputcode[100];
+	printf("=== 7-11 POS System===\n");
+	printf("shu ru code mai   shu ru 0 tui chu:\n\n");
+	while (1) {
+		printf("Barcode:");
+		scanf("%99s", inputcode);
+		if (strcmp(inputcode, "quit") == 0 || strcmp(inputcode, "exit")== 0) {
+			printf("Goodbye!!!\n");
+			return 0;
+		}
+		else if (strcmp(inputcode, "0") == 0) {
+			printf("Goodbye\n");
+			break;
+		}
+		else if (strcmp(inputcode, "prices") == 0 || strcmp(inputcode, "price")== 0) {
+			printf("\nItem\t\tNo.\tPri.\n");
+			printf("-----------------------------\n");
+			for (int i = 0;i < a;i++) {
+				printf(" ");
+				fputs(shop[i].name, stdout);
+				printf("\t\t");
+				fputs(shop[i].code, stdout);
+				printf("\t$%.2f\n", shop[i].price);
+			}
+			printf("-----------------------------\n\n");
+			continue;
+		}
+		else {
+			int found = -1;
+			for (int i = 0;i < a;i++) {
+				if (strcmp(inputcode, shop[i].code) == 0) {
+					printf("Item: ");
+					fputs(shop[i].name, stdout);
+					printf(", price: $%.2f\n", shop[i].price);
+					found = i;
+					break;
+				}
+			}
+			if (found == -1) {
+				printf("product not found!\n");
+			}
+			else {
+				sum_price += shop[found].price;
+				int c = -1;
+				for (int j = 0;j < b;j++) {
+					if (strcmp(cart[j].code, inputcode) == 0) {
+						c = j;
+						break;
+ 					}
+				}
+				if (c = -1) {
+					cart[c].quantity++;
+					printf("Added: % s(quantity:%d)\n"), shop[found].name, cart[c].quantity;
+				}
+				else {
+					strcpy(cart[c].code, inputcode);
+					cart[c].quantity = 1;
+					b++;
+					printf("Added:%s(quantity:1)\n",shop[found].name);
+				}
+			}
+		}
+	}
+	return 0;
+}
